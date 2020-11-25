@@ -1,33 +1,36 @@
 // ==UserScript==
 /* globals jQuery, $, waitForKeyElements */
 // @require      https://cdn.staticfile.org/jquery/3.3.1/jquery.min.js
-// @name         Hrbust Auto-Eva
+// @name         哈尔滨理工大学 教务在线 教学评价、评估课程自动完成脚本 Hrbust Auto-Eva
 // @namespace    http://tampermonkey.net/
-// @version      0.1
-// @description  try to take over the world!
-// @author       Jason
+// @version      0.3
+// @description  哈尔滨理工大学（hrbust） 教学评估自动完成脚本。在http://jwzx.hrbust.edu.cn/内，评估课程，教学评价自动完成脚本。使用方法：打开教务在线-点击"评估课程"/"教学评价"，稍等片刻，自动完成全部课程评价。
+// @author       Jason Zhang
 // @match        http://jwzx.hrbust.edu.cn/academic/eva/index/evaindexinfo.jsdo*
 // @match        http://jwzx.hrbust.edu.cn/academic/eva/index/resultlist.jsdo*
 // @run-at       document-end
 
 
 // ==/UserScript==
-(function() {
+(function () {
     'use strict';
+    // 设置 setting
+    var interval_time = 100; //设置模拟刷新时间，单位毫秒
+    var auto_commit = 1;//设置自动提交
+    //代码中randomApprove(), randomAdvice(), randomOther()方法可自定义评价内容
 
-    // Your code here...
 
-    let interval = window.setInterval(listen, 1000);
+    let interval = window.setInterval(listen, interval_time);
 
     let count = 0;
 
     function listen() {
         console.log("Auto-Eva Listening...");
 
-        if(window.location.href.indexOf("evaindexinfo") !== -1){
+        if (window.location.href.indexOf("evaindexinfo") !== -1) {
             eva_core();
         }
-        if(window.location.href.indexOf("resultlist") !== -1){
+        if (window.location.href.indexOf("resultlist") !== -1) {
             let eva_tag = $("#li14 > a");
 
             //let innerTabRow = $("body > center > table.infolist_tab > tbody > tr");
@@ -43,7 +46,7 @@
             //body > center > table.infolist_tab > tbody > tr:nth-child(1)
             let innerTabRow = $("body > center > table.infolist_tab > tbody > tr");
 
-            for (let i = 1; i < innerTabRow.length; i++) {
+            for (let i = 1; i <= innerTabRow.length; i++) {
                 //评估 a href标签  nth-child 选择第n个子节点，从1开始
                 let rowLink = $("body > center > table.infolist_tab > tbody > tr:nth-child(" + i + ") > td:nth-child(4) > a");
 
@@ -52,27 +55,20 @@
                     //未评估 可以点：评估
                     //console.log(rowLink[0].href)
 
-                    window.parent.frames['mainFrame'].location.href=rowLink[0].href;
+                    window.parent.frames['mainFrame'].location.href = rowLink[0].href;
                     count++;
 
                 }
                 //body > table > tbody > tr:nth-child(8) > td:nth-child(4) > a
                 //body > table > tbody > tr:nth-child(8) > td:nth-child(4) > a
-                if(count >= innerTabRow.length){//如果完成了，则取消这个监听器
+                if (count >= innerTabRow.length) {//如果完成了，则取消这个监听器
                     console.log("完成！！！")
                     clearInterval(interval)
                 }
             }
 
-
-
-
         }
 
-
-
-
-        //}
     }
 
 
@@ -110,7 +106,10 @@
 
 
         //提交
-        document.form1.submit();
+        if (auto_commit == 1) {
+            document.form1.submit();
+        }
+
     }
 
 
@@ -197,10 +196,6 @@
         return good;
 
     }
-
-
-
-
 
 
 })();
