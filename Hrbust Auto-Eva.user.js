@@ -6,52 +6,112 @@
 // @version      0.1
 // @description  try to take over the world!
 // @author       Jason
-// @match        http://jwzx.hrbust.edu.cn/academic/eva/index/evaindexinfo.jsdo?*
+// @match        http://jwzx.hrbust.edu.cn/academic/eva/index/evaindexinfo.jsdo*
+// @match        http://jwzx.hrbust.edu.cn/academic/eva/index/resultlist.jsdo*
 // @run-at       document-end
 
 
 // ==/UserScript==
-(function () {
+(function() {
     'use strict';
 
     // Your code here...
 
-    console.log("Auto-Eva start...");
+    let interval = window.setInterval(listen, 1000);
 
-    //取出所有radios组件
-    var radios = $("input:radio");
-    console.log(radios)
-    //有radios的行数
-    let rowNums = radios.length % 4 === 0 ? radios.length / 4 : -1;
-    console.log("radios评估共：" + rowNums + "行");
+    let count = 0;
 
-    if (rowNums !== -1) {
-        //除了最后一行总评，随机取出一个，评价为良好，其他全部优秀
-        let level2 = Math.ceil(Math.random() * (rowNums - 1));
+    function listen() {
+        console.log("Auto-Eva Listening...");
 
-        // console.log(rowNums)
-        for (let i = 0; i < rowNums; i++) {
-            if (i !== level2) {
-                checkRadioIndexOf(radios, i, 0);
-            } else {
-                checkRadioIndexOf(radios, i, 1);
+        if(window.location.href.indexOf("evaindexinfo") !== -1){
+            eva_core();
+        }
+        if(window.location.href.indexOf("resultlist") !== -1){
+            let eva_tag = $("#li14 > a");
+
+            //let innerTabRow = $("body > center > table.infolist_tab > tbody > tr");
+            //console.log(innerTabRow)
+
+            //如果评估课程选中
+            //if (eva_tag.length !== 0 && eva_tag[0].className === "cur") {
+            console.log("--------")
+            // body > center > table.infolist_tab > tbody > tr:nth-child(8) > td:nth-child(4) > a
+            //body > table > tbody > tr:nth-child(2)
+            // let innerTabRow = $("body > center > table.infolist_tab > tbody > tr");
+
+            //body > center > table.infolist_tab > tbody > tr:nth-child(1)
+            let innerTabRow = $("body > center > table.infolist_tab > tbody > tr");
+
+            for (let i = 1; i < innerTabRow.length; i++) {
+                //评估 a href标签  nth-child 选择第n个子节点，从1开始
+                let rowLink = $("body > center > table.infolist_tab > tbody > tr:nth-child(" + i + ") > td:nth-child(4) > a");
+
+                // body > center > table.infolist_tab > tbody > tr:nth-child(8) > td:nth-child(4) > a
+                if (rowLink.length !== 0) {
+                    //未评估 可以点：评估
+                    //console.log(rowLink[0].href)
+
+                    window.parent.frames['mainFrame'].location.href=rowLink[0].href;
+                    count++;
+
+                }
+                //body > table > tbody > tr:nth-child(8) > td:nth-child(4) > a
+                //body > table > tbody > tr:nth-child(8) > td:nth-child(4) > a
+                if(count >= innerTabRow.length){//如果完成了，则取消这个监听器
+                    console.log("完成！！！")
+                    clearInterval(interval)
+                }
             }
+
+
+
+
         }
 
+
+
+
+        //}
     }
 
 
-    //填充文字评价
-    let textareas = $("textarea");
+    function eva_core() {
+        //取出所有radios组件
+        var radios = $("input:radio");
+        console.log(radios)
+        //有radios的行数
+        let rowNums = radios.length % 4 === 0 ? radios.length / 4 : -1;
+        console.log("radios评估共：" + rowNums + "行");
 
-    textareas[0].innerText = randomApprove();
-    textareas[1].innerText = randomImprove();
-    textareas[2].innerText = randomAdvice();
-    textareas[3].innerText = randomOther();
+        if (rowNums !== -1) {
+            //除了最后一行总评，随机取出一个，评价为良好，其他全部优秀
+            let level2 = Math.ceil(Math.random() * (rowNums - 1));
+
+            // console.log(rowNums)
+            for (let i = 0; i < rowNums; i++) {
+                if (i !== level2) {
+                    checkRadioIndexOf(radios, i, 0);
+                } else {
+                    checkRadioIndexOf(radios, i, 1);
+                }
+            }
+
+        }
 
 
-    //提交
-    //document.form1.submit();
+        //填充文字评价
+        let textareas = $("textarea");
+
+        textareas[0].innerText = randomApprove();
+        textareas[1].innerText = randomImprove();
+        textareas[2].innerText = randomAdvice();
+        textareas[3].innerText = randomOther();
+
+
+        //提交
+        document.form1.submit();
+    }
 
 
     //选择第row行的第index个radio，其中row从0开始，index从0开始
@@ -137,6 +197,10 @@
         return good;
 
     }
+
+
+
+
 
 
 })();
