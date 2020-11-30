@@ -3,13 +3,14 @@
 // @require      https://cdn.staticfile.org/jquery/3.3.1/jquery.min.js
 // @name         哈尔滨理工大学 教务在线 教学评价、评估课程自动完成脚本 Hrbust Auto-Eva
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  哈尔滨理工大学（hrbust） 教学评估自动完成脚本。在http://jwzx.hrbust.edu.cn/内，评估课程，教学评价自动完成脚本。使用方法：打开教务在线-点击"评估课程"/"教学评价"，稍等片刻，自动完成全部课程评价。
 // @author       Jason Zhang
 // @match        http://jwzx.hrbust.edu.cn/academic/eva/index/evaindexinfo.jsdo*
 // @match        http://jwzx.hrbust.edu.cn/academic/eva/index/resultlist.jsdo*
 // @run-at       document-end
-
+// @icon         https://s3.ax1x.com/2020/11/22/DG9DVe.png
+// @icon64       https://s3.ax1x.com/2020/11/22/DG9DVe.png
 
 // ==/UserScript==
 (function () {
