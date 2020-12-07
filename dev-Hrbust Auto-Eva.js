@@ -3,10 +3,13 @@
 // @require      https://cdn.staticfile.org/jquery/3.3.1/jquery.min.js
 // @name         dev-Hrbust Auto-Eva
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      1.5
 // @description  哈尔滨理工大学（hrbust） 教学评估自动完成脚本。在http://jwzx.hrbust.edu.cn/内，评估课程，教学评价自动完成脚本。使用方法：打开教务在线-点击"评估课程"/"教学评价"，稍等片刻，自动完成全部课程评价。
 // @author       Jason Zhang
 // @match        http://localhost:63342/Hrbust*
+//// @match        http://jwzx.hrbust.edu.cn/academic/eva/index/evaindexinfo.jsdo*
+//// @match        http://jwzx.hrbust.edu.cn/academic/eva/index/resultlist.jsdo*
+//// @match        http://jwzx.hrbust.edu.cn/academic/manager/score/studentOwnScore.do*
 // @run-at       document-end
 
 // ==/UserScript==
@@ -53,15 +56,17 @@
 
 
 /////////////////////////---- start -----///////////////////////////
+    var URL_keyword_score = "hae-score";
+    var URL_keyword_evaindexinfo = "hae-eva-main";
+    var URL_keyword_resultlist = "hae-eva-list";
     listen(); //程序开始
-
 
 
     function listen() {
         console.log("Hrbust Auto-Eva started...");
 
 
-        if (window.location.href.indexOf("hae-score") !== -1) {
+        if (window.location.href.indexOf(URL_keyword_score) !== -1) {
             //alert();
             let query_table = $("body > center > form > table > tbody > tr");
             let cal_td = "<td><input name='hae_cal' type='button' id='hae_cal' class='button' value='计算绩点'></td>";
@@ -80,7 +85,7 @@
                     'sortColumn': '',
                     'Submit': '查询',
                 },
-                success:function (result) {
+                success: function (result) {
                     var base = document.createElement('div');
                     base.innerHTML = result;
                     //div > center > table > tbody > tr:nth-child(2)
@@ -94,10 +99,10 @@
             })
         }
 
-        if (window.location.href.indexOf("hae-eva-main") !== -1) {
+        if (window.location.href.indexOf(URL_keyword_evaindexinfo) !== -1) {
             eva_core();
         }
-        if (window.location.href.indexOf("hae-eva-list") !== -1) {
+        if (window.location.href.indexOf(URL_keyword_resultlist) !== -1) {
             let eva_tag = $("#li14 > a");
             let count = 0;
             //let innerTabRow = $("body > center > table.infolist_tab > tbody > tr");

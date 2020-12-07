@@ -59,15 +59,19 @@
 
 
 /////////////////////////---- start -----///////////////////////////
-    listen();
+    //var URL_keyword_score = "studentOwnScore"; //学生个人成绩URL关键词
+    var URL_keyword_evaindexinfo = "evaindexinfo"; //评价详细信息URL关键词
+    var URL_keyword_resultlist = "resultlist"; //待评价列表URL关键词
+
+    listen(); //程序开始
 
     function listen() {
-        console.log("Auto-Eva Listening...");
+        console.log("Auto-Eva started...");
 
-        if (window.location.href.indexOf("evaindexinfo") !== -1) {
+        if (window.location.href.indexOf(URL_keyword_evaindexinfo) !== -1) {
             eva_core();
         }
-        if (window.location.href.indexOf("resultlist") !== -1) {
+        if (window.location.href.indexOf(URL_keyword_resultlist) !== -1) {
             let eva_tag = $("#li14 > a");
             let count = 0;
             //let innerTabRow = $("body > center > table.infolist_tab > tbody > tr");
