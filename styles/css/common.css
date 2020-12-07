@@ -1,0 +1,144 @@
+@import "jquery.ui.all.css";
+html {
+    background-color: #FFFFFF;
+}
+body {
+    font-size: 12px;
+    font-family: "ËÎÌå";
+    color:#000000;
+    line-height:150%;
+    text-align:center;
+
+    SCROLLBAR-FACE-COLOR: #C8D6FB;
+    SCROLLBAR-HIGHLIGHT-COLOR: #ffffff;
+    SCROLLBAR-SHADOW-COLOR: #00388c;
+    SCROLLBAR-3DLIGHT-COLOR: #00388c;
+    SCROLLBAR-ARROW-COLOR: #00388c;
+    SCROLLBAR-TRACK-COLOR: #DAE3FC;
+    SCROLLBAR-DARKSHADOW-COLOR: #ffffff;
+}
+
+input.button{
+    font-size: 12px;
+    text-decoration: none;
+    letter-spacing: 1px;
+    padding:0px 10px;
+    padding-top:0px !important;
+    padding-top:4px;
+    overflow:visible;
+    background: url(../images/button.jpg) left 1px repeat-x;
+    height:18px;
+    height: 15px\9;
+    border: 1px solid #D18C0C;
+    font-family: "ËÎÌå";
+    color: #333333;
+    margin-top:1px;
+    line-height:90%;
+}
+
+input{
+    height: 18px;
+    border: 1px solid #000000;
+    font-size:12px;
+    /* width:expression(((this.type=="button") || (this.type=="submit") || (this.type == "checkbox") || (this.type == "radio") || (this.type == "file")) ? "": "50%"); */
+}
+
+input.check{
+    border:0px;
+    vertical-align:text-bottom;
+}
+
+textarea{
+    border:1px solid #000000;
+    overflow: auto;
+}
+
+TEXTAREA {
+    FONT-SIZE: 12px;
+    BEHAVIOR: url(#default#savehistory);
+    COLOR: #000000;
+    font-family: "ËÎÌå";
+}
+
+table{
+    text-align:left;
+    font-size: 12px;
+    line-height:150%;
+    font-family: "ËÎÌå";
+    color:#000000;
+}
+
+td.center{
+    text-align:center;
+}
+
+td.top{
+    vertical-align:top;
+    padding-top:4px;
+}
+
+img{
+    border:0px;
+}
+
+
+/*error page*/
+table.error{
+    width:679px;
+    border:0px;
+    margin-top:75px;
+}
+table.error #bg{
+    background-image:url(../images/error_bg1.gif);
+    background-repeat: repeat-y;
+    background-position: top left;
+}
+table.error #bottom{
+    background-image:url(../images/error_bottom.gif);
+    background-repeat: no-repeat;
+    background-position: top left;
+    height:31px;
+}
+
+table.error_top{
+    width:100%;
+    border:0px;
+    height:280px;
+}
+table.error_black{
+    width:106px;
+    border:0px;
+    margin-top:135px;
+    margin-right:81px;
+}
+table.error_top #top{
+    background-image:url(../images/error_top.gif);
+    background-repeat: no-repeat;
+    background-position: top left;
+}
+td.black_com{
+    background-image:url(../images/back_1.gif);
+    background-repeat: no-repeat;
+    background-position: top left;
+    height:106px;
+    height:38px;
+    cursor:hand;
+}
+td.black_cur{
+    background-image:url(../images/back_2.gif);
+    background-repeat: no-repeat;
+    background-position: top left;
+    width:106px;
+    height:38px;
+    cursor:hand;
+}
+#content_margin{
+    padding-top:55px;
+    padding-left:10px;
+    padding-right:70px;
+    font-family: "ËÎÌå";
+    font-size: 14px;
+    color: #A20000;
+    letter-spacing: 2px;
+    line-height: 170%;
+}
