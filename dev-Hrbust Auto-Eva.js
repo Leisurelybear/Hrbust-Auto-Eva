@@ -67,7 +67,7 @@
 
 
         if (window.location.href.indexOf(URL_keyword_score) !== -1) {
-            //alert();
+
             let query_table = $("body > center > form > table > tbody > tr");
             let cal_td = "<td><input name='hae_cal' type='button' id='hae_cal' class='button' value='计算绩点'></td>";
             query_table.append(cal_td);
