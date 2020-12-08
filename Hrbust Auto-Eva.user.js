@@ -63,13 +63,13 @@
     var URL_keyword_score = "studentOwnScore"; //学生个人成绩URL关键词
     var URL_keyword_evaindexinfo = "evaindexinfo"; //评价详细信息URL关键词
     var URL_keyword_resultlist = "resultlist"; //待评价列表URL关键词
+    var dataMap = new Map();//数据map
 
     listen(); //程序开始
 
     function listen() {
         console.log("Auto-Eva started...");
 
-        var dataMap = new Map();//数据map
 
         if (window.location.href.indexOf(URL_keyword_score) !== -1) {
 
@@ -79,43 +79,10 @@
 
             appendGPA();
 
-
+            //点击计算GPA
             $("#hae_cal_score").click(function () {
-                if (dataMap.has(URL_keyword_score)) {
-                    console.log(dataMap.get(URL_keyword_score));
-                    return;
-                }
-                $.ajax({
-                    type: "POST",
-                    url: "http://jwzx.hrbust.edu.cn/academic/manager/score/studentOwnScore.do",
-                    data: {
-                        'year': '',
-                        'term': '2',
-                        'prop': '',
-                        'groupName': '',
-                        'para': '0',
-                        'sortColumn': '',
-                        'Submit': '查询',
-                    },
-                    success: function (result) {
-                        var base = document.createElement('div');//创建dom节点
-                        base.innerHTML = result;//把请求的网页放到div中
-                        //div > center > table > tbody > tr:nth-child(2)
-
-                        let tbody = base.querySelector("div > center > table > tbody");//选择器选择出tr
-                        tbody.removeChild(tbody.firstChild);//移除表头
-                        let rows = tbody.children;//rows为许多行成绩
-
-                        dataMap.set(URL_keyword_score, rows);
-                        for (let i = 0; i < rows.length; i++) {
-
-                        }
-                        //console.log(rows);
-
-                    }
-
-                });
-            })
+                calGPA()
+            });
 
         }
 
@@ -157,6 +124,48 @@
 
     }
 
+    /**
+     * 某一门学科的GPA：(期末总评-50.0)/10.0（不及格科目GPA为0）
+     备注：五级分制期末总评：优秀95，良好85，中75，及格65，不及格50。
+     所有学科的GPA：（学科1GPA×学科1学分数+学科2GPA×学科2学分数+......）］/(所有学科学分之和)
+     */
+    function calGPA() {
+        alert()
+        if (dataMap.has(URL_keyword_score)) {
+            console.log(dataMap.get(URL_keyword_score));
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "http://jwzx.hrbust.edu.cn/academic/manager/score/studentOwnScore.do",
+            data: {
+                'year': '',
+                'term': '2',
+                'prop': '',
+                'groupName': '',
+                'para': '0',
+                'sortColumn': '',
+                'Submit': '查询',
+            },
+            success: function (result) {
+                var base = document.createElement('div');//创建dom节点
+                base.innerHTML = result;//把请求的网页放到div中
+                //div > center > table > tbody > tr:nth-child(2)
+
+                let tbody = base.querySelector("div > center > table > tbody");//选择器选择出tr
+                tbody.removeChild(tbody.firstChild);//移除表头
+                let rows = tbody.children;//rows为许多行成绩
+
+                dataMap.set(URL_keyword_score, rows);
+                for (let i = 0; i < rows.length; i++) {
+
+                }
+                //console.log(rows);
+
+            }
+
+        });
+    }
 
     function eva_core() {
         //取出所有radios组件
@@ -326,7 +335,7 @@
     function appendGPA() {
         let rowlength = $("body > center > table > tbody > tr").length - 1;
         let headRow = $("body > center > table > tbody > tr:nth-child(1)");
-        console.log(headRow)
+        //console.log(headRow)
         headRow.append("<th>单科GPA</th>");
         for (let i = 2; i <= 1 + rowlength; i++) {
             let currentRow = $("body > center > table > tbody > tr:nth-child(" + i + ")");
@@ -335,25 +344,38 @@
             let currentRowTds = $("body > center > table > tbody > tr:nth-child(" + i + ") > td");
 
             // console.log(tdInfos)
-            let score = currentRowTds[6].innerHTML;
-            let credit = currentRowTds[7].innerHTML;
+            let score = currentRowTds[6].innerHTML.trim();
+            let credit = currentRowTds[7].innerHTML.trim();
+            let pass_state = currentRowTds[12].innerHTML.trim();
+            //五级分制期末总评：优秀95，良好85，中75，及格65，不及格50。
+            if (isNaN(Number(score))) {//如果不是数字类型
+                switch (score.trim()) {
+                    // score.trim()
+                    case "优秀":
+                        score = 95;
+                        break;
+                    case "良":
+                        score = 85;
+                        break;
+                    case "中":
+                        score = 75;
+                        break;
+                    case "及格":
+                        score = 65;
+                        break;
+                    case "不及格":
+                        score = 50;
+                        break;
+                    default:
+                }
+            }
 
-            let GPA = score < 60 ? 0 : ((score - 50.0) / 10.0);
+            let GPA = pass_state === '及格' ? ((score - 50.0) / 10.0) : 0;
 
             let td_GPA = "<td>" + GPA + "</td>";
-
             currentRow.append(td_GPA);
 
         }
-
-    }
-
-    /**
-     * 某一门学科的GPA：(期末总评-50.0)/10.0（不及格科目GPA为0）
-     备注：五级分制期末总评：优秀95，良好85，中75，及格65，不及格50。
-     所有学科的GPA：（学科1GPA×学科1学分数+学科2GPA×学科2学分数+......）］/(所有学科学分之和)
-     */
-    function calGPA() {
 
     }
 
