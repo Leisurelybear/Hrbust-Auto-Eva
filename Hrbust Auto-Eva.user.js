@@ -74,7 +74,7 @@
         if (window.location.href.indexOf(URL_keyword_score) !== -1) {
 
             let query_table = $("body > center > form > table > tbody > tr");
-            let cal_td = "<td><input name='hae_cal_score' type='button' id='hae_cal_score' class='button' value='计算全部GPA'></td>";
+            let cal_td = "<td><input name='hae_cal_score' type='button' id='hae_cal_score' class='button' value='计算GPA'></td>";
             query_table.append(cal_td); //添加按钮
 
             appendGPA();
@@ -130,41 +130,120 @@
      所有学科的GPA：（学科1GPA×学科1学分数+学科2GPA×学科2学分数+......）］/(所有学科学分之和)
      */
     function calGPA() {
-        alert()
+        $("#hae_tb_gpa").remove();
+
         if (dataMap.has(URL_keyword_score)) {
-            console.log(dataMap.get(URL_keyword_score));
-            return;
-        }
-        $.ajax({
-            type: "POST",
-            url: "http://jwzx.hrbust.edu.cn/academic/manager/score/studentOwnScore.do",
-            data: {
-                'year': '',
-                'term': '2',
-                'prop': '',
-                'groupName': '',
-                'para': '0',
-                'sortColumn': '',
-                'Submit': '查询',
-            },
-            success: function (result) {
-                var base = document.createElement('div');//创建dom节点
-                base.innerHTML = result;//把请求的网页放到div中
-                //div > center > table > tbody > tr:nth-child(2)
+            // console.log(dataMap.get(URL_keyword_score));
 
-                let tbody = base.querySelector("div > center > table > tbody");//选择器选择出tr
-                tbody.removeChild(tbody.firstChild);//移除表头
-                let rows = tbody.children;//rows为许多行成绩
 
-                dataMap.set(URL_keyword_score, rows);
-                for (let i = 0; i < rows.length; i++) {
+        } else {
+            //请求全部科目
+            $.ajax({
+                type: "POST",
+                url: "http://jwzx.hrbust.edu.cn/academic/manager/score/studentOwnScore.do",
+                data: {
+                    'year': '',
+                    'term': '',
+                    'prop': '',
+                    'groupName': '',
+                    'para': '0',
+                    'sortColumn': '',
+                    'Submit': '查询',
+                },
+                async: false,
+                success: function (result) {
+                    var base = document.createElement('div');//创建dom节点
+                    base.innerHTML = result;//把请求的网页放到div中
+                    //div > center > table > tbody > tr:nth-child(2)
 
+                    let tbody = base.querySelector("div > center > table > tbody");//选择器选择出tr
+                    tbody.removeChild(tbody.firstChild);//移除表头
+                    let rows = tbody.children;//rows为许多行成绩
+
+                    dataMap.set(URL_keyword_score, rows);
                 }
-                //console.log(rows);
+
+
+            });
+        }
+        let rows = dataMap.get(URL_keyword_score);
+
+        //为了去重课程号，对于挂科科目，特殊标记；其中已过科目为0，挂科后补过标记为1（方便计算时候剔除）
+        let courseNumberMap = new Map();
+
+        let gpaALLWeight = 0;//加权GPA：单科GPA*学分之和
+        let creditALL = 0;//单科学分之和
+
+        let gpaRCWeight = 0;//加权GPA：仅必修课
+        let creditRC = 0;//仅必修课
+
+        let gpaCurrentPage = 0;//当前页面
+        let creditCurrentPage = 0;//当前页面
+
+        console.log(rows.length)
+        for (let i = 0; i < rows.length; i++) {
+            let currentRowTds = rows[i].children;
+
+            let courseNumber = currentRowTds[2].innerHTML.trim();//课程号
+            let score = currentRowTds[6].innerHTML.trim();//成绩
+            let credit = Number.parseFloat(currentRowTds[7].innerHTML.trim());//学分
+            let courseType = currentRowTds[9].innerHTML.trim();//课程属性，是否为必修
+            let passState = currentRowTds[12].innerHTML.trim();//通过状态
+
+            if (courseNumberMap.has(courseNumber)) {
+                //之前统计过，无需再次统计
+                continue;
+            }
+
+            //五级分制期末总评：优秀95，良好85，中75，及格65，不及格50。
+            if (isNaN(Number(score))) {//如果不是数字类型
+                score = getScoreBy5Level(score.trim());
+            }
+
+            let GPA = passState === '及格' ? ((score - 50.0) / 10.0) : 0;
+
+            if (GPA === 0) {//挂科
+                courseNumberMap.set(courseNumber, 1);//设置为挂科
+
+                console.log("不及格 + " + currentRowTds[3].innerHTML)
+
+                gpaALLWeight += 0;//加权GPA + 0
+                creditALL += credit;//学分需要加
+                if (courseType === "必修") {//必修课
+                    gpaRCWeight += 0;//加权GPA + 0
+                    creditRC += credit;//学分需要加
+                }
+
+                // alert("科目：" + currentRowTds[3].innerHTML + " = GPA：" + GPA + " - 学分: " + credit)
+            } else {//正常通过
+                courseNumberMap.set(courseNumber, 0);//正常通过科目
+
+                // alert("科目：" + currentRowTds[3].innerHTML + " = GPA：" + GPA + " - 学分: " + credit)
+                gpaALLWeight += (GPA * credit);//加权GPA + 0
+                creditALL += credit;//学分需要加
+                if (courseType === "必修") {//必修课
+                    gpaRCWeight += (GPA * credit);//加权GPA 增加
+                    creditRC += credit;//学分需要加
+                }
 
             }
 
-        });
+        }
+
+        let gpaALL = gpaALLWeight.toFixed(2) / creditALL;
+        let gpaRC = gpaRCWeight.toFixed(2) / creditRC;
+
+        let queryTable = $("body > center > form");
+        let GPA_Table_HTML = "" +
+            "<table class='form' cellspacing='0' cellpadding='0' id='hae_tb_gpa'>" +
+            "<tr><td>所有已修学科GPA（全部）</td><td>" + gpaALL + "</td></tr>" +
+            "<tr><td>所有已修学科GPA（仅必修）</td><td>" + gpaRC + "</td></tr>" +
+            "<tr><td>当前页面GPA（全部）</td><td>" + gpaCurrentPage + "</td></tr>" +
+            "<tr style='color: red'><td colspan='2' title='某一门学科的GPA：(期末总评-50.0)/10.0（不及格科目GPA为0）\n备注：五级分制期末总评：优秀95，良好85，中75，及格65，不及格50。\n所有学科的GPA：（学科1GPA×学科1学分数+学科2GPA×学科2学分数+......）］/(所有学科学分之和)'>提示：计算结果仅供参考！<b>【计算方法】</b>（鼠标悬浮查看）</td></tr>" +
+            "</table>";
+
+        $("#hae_tb_gpa").remove();
+        queryTable.append(GPA_Table_HTML);
     }
 
     function eva_core() {
@@ -349,25 +428,7 @@
             let pass_state = currentRowTds[12].innerHTML.trim();
             //五级分制期末总评：优秀95，良好85，中75，及格65，不及格50。
             if (isNaN(Number(score))) {//如果不是数字类型
-                switch (score.trim()) {
-                    // score.trim()
-                    case "优秀":
-                        score = 95;
-                        break;
-                    case "良":
-                        score = 85;
-                        break;
-                    case "中":
-                        score = 75;
-                        break;
-                    case "及格":
-                        score = 65;
-                        break;
-                    case "不及格":
-                        score = 50;
-                        break;
-                    default:
-                }
+                score = getScoreBy5Level(score.trim());
             }
 
             let GPA = pass_state === '及格' ? ((score - 50.0) / 10.0) : 0;
@@ -377,6 +438,32 @@
 
         }
 
+    }
+
+    //五级分制期末总评：优秀95，良好85，中75，及格65，不及格50。
+    function getScoreBy5Level(str) {
+        let score = NaN;
+        switch (str.trim()) {
+            // score.trim()
+            case "优秀":
+                score = 95;
+                break;
+            case "良":
+                score = 85;
+                break;
+            case "中":
+                score = 75;
+                break;
+            case "及格":
+                score = 65;
+                break;
+            case "不及格":
+                score = 50;
+                break;
+            default:
+                score = str;
+        }
+        return score;
     }
 
 
