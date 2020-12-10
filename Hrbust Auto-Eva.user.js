@@ -3,7 +3,7 @@
 // @require      https://cdn.staticfile.org/jquery/3.3.1/jquery.min.js
 // @name         哈尔滨理工大学 教务在线 教学评价、评估课程自动完成脚本 Hrbust Auto-Eva
 // @namespace    http://tampermonkey.net/
-// @version      1.4
+// @version      1.5
 // @description  哈尔滨理工大学（hrbust） 教学评估自动完成脚本。在http://jwzx.hrbust.edu.cn/内，评估课程，教学评价自动完成脚本。使用方法：打开教务在线-点击"评估课程"/"教学评价"，稍等片刻，自动完成全部课程评价。
 // @author       Jason Zhang
 // @homepageURL  https://github.com/zhangxujie2018/Hrbust-Auto-Eva
@@ -67,6 +67,9 @@
 
     listen(); //程序开始
 
+    /**
+     * 监听程序开始，监听用户进入的页面是匹配
+     */
     function listen() {
         console.log("Auto-Eva started...");
 
@@ -125,9 +128,57 @@
     }
 
     /**
-     * 某一门学科的GPA：(期末总评-50.0)/10.0（不及格科目GPA为0）
-     备注：五级分制期末总评：优秀95，良好85，中75，及格65，不及格50。
-     所有学科的GPA：（学科1GPA×学科1学分数+学科2GPA×学科2学分数+......）］/(所有学科学分之和)
+     * 计算当前页面的GPA
+     * 注：其中多处计算扩大了倍数，是为了变成整数计算，保持浮点数精度
+     * @returns {string}
+     */
+    function calculateCurrentPage() {
+
+        let gpaCurrentPage = 0;//当前页面
+        let creditCurrentPage = 0;//当前页面
+
+        let rowlength = $("body > center > table > tbody > tr").length - 1;
+        let headRow = $("body > center > table > tbody > tr:nth-child(1)");
+
+        for (let i = 2; i <= 1 + rowlength; i++) {
+
+            //当前行的所有td
+            let currentRowTds = $("body > center > table > tbody > tr:nth-child(" + i + ") > td");
+
+
+            let credit = currentRowTds[7].innerHTML.trim();
+            let gpa = currentRowTds[13].innerHTML.trim();
+            let testState = currentRowTds[11].innerHTML.trim();//考试状态
+
+            if (testState !== "正常考试") {
+                //补考或重修，不计入
+                continue;
+            }
+
+            //gpa = gpa * 100
+            gpa = parseFloat((gpa * 100).toFixed(10));
+            //credit = credit * 10
+            credit = parseFloat((credit * 10).toFixed(10));
+
+            gpaCurrentPage += (gpa * credit);
+            creditCurrentPage += credit;
+
+        }
+
+        //creditCurrentPage *= 100;
+        creditCurrentPage = parseFloat((creditCurrentPage * 100).toFixed(10));
+
+        return (gpaCurrentPage / creditCurrentPage).toFixed(2);
+
+    }
+
+
+    /**
+     *  某一门学科的GPA：(期末总评-50.0)/10.0（不及格科目GPA为0）
+     *  备注：五级分制期末总评：优秀95，良好85，中75，及格65，不及格50。
+     *  所有学科的GPA：（学科1GPA×学科1学分数+学科2GPA×学科2学分数+......）］/(所有学科学分之和)
+     *
+     *  注：其中多处计算扩大了倍数，是为了变成整数计算，保持浮点数精度
      */
     function calGPA() {
         $("#hae_tb_gpa").remove();
@@ -168,30 +219,23 @@
         }
         let rows = dataMap.get(URL_keyword_score);
 
-        //为了去重课程号，对于挂科科目，特殊标记；其中已过科目为0，挂科后补过标记为1（方便计算时候剔除）
-        let courseNumberMap = new Map();
-
         let gpaALLWeight = 0;//加权GPA：单科GPA*学分之和
         let creditALL = 0;//单科学分之和
 
         let gpaRCWeight = 0;//加权GPA：仅必修课
         let creditRC = 0;//仅必修课
 
-        let gpaCurrentPage = 0;//当前页面
-        let creditCurrentPage = 0;//当前页面
-
-        console.log(rows.length)
         for (let i = 0; i < rows.length; i++) {
             let currentRowTds = rows[i].children;
 
-            let courseNumber = currentRowTds[2].innerHTML.trim();//课程号
             let score = currentRowTds[6].innerHTML.trim();//成绩
             let credit = Number.parseFloat(currentRowTds[7].innerHTML.trim());//学分
             let courseType = currentRowTds[9].innerHTML.trim();//课程属性，是否为必修
             let passState = currentRowTds[12].innerHTML.trim();//通过状态
+            let testState = currentRowTds[11].innerHTML.trim();//考试状态
 
-            if (courseNumberMap.has(courseNumber)) {
-                //之前统计过，无需再次统计
+            if (testState !== "正常考试") {
+                //补考或重修，不计入
                 continue;
             }
 
@@ -202,11 +246,12 @@
 
             let GPA = passState === '及格' ? ((score - 50.0) / 10.0) : 0;
 
+            //GPA = GPA * 100
+            GPA = parseFloat((GPA * 100).toFixed(10));
+            //credit = credit * 10
+            credit = parseFloat((credit * 10).toFixed(10));
+
             if (GPA === 0) {//挂科
-                courseNumberMap.set(courseNumber, 1);//设置为挂科
-
-                console.log("不及格 + " + currentRowTds[3].innerHTML)
-
                 gpaALLWeight += 0;//加权GPA + 0
                 creditALL += credit;//学分需要加
                 if (courseType === "必修") {//必修课
@@ -214,11 +259,8 @@
                     creditRC += credit;//学分需要加
                 }
 
-                // alert("科目：" + currentRowTds[3].innerHTML + " = GPA：" + GPA + " - 学分: " + credit)
-            } else {//正常通过
-                courseNumberMap.set(courseNumber, 0);//正常通过科目
+            } else {//通过
 
-                // alert("科目：" + currentRowTds[3].innerHTML + " = GPA：" + GPA + " - 学分: " + credit)
                 gpaALLWeight += (GPA * credit);//加权GPA + 0
                 creditALL += credit;//学分需要加
                 if (courseType === "必修") {//必修课
@@ -227,25 +269,36 @@
                 }
 
             }
-
         }
 
-        let gpaALL = gpaALLWeight.toFixed(2) / creditALL;
-        let gpaRC = gpaRCWeight.toFixed(2) / creditRC;
+        //creditALL *= 100;
+        creditALL = parseFloat((creditALL * 100).toFixed(10));
+        //creditRC *= 100;
+        creditRC = parseFloat((creditRC * 100).toFixed(10));
+
+
+        let gpaALL = (gpaALLWeight / creditALL).toFixed(2);
+        let gpaRC = (gpaRCWeight / creditRC).toFixed(2);
+        let gpaCurrentPage = calculateCurrentPage();
+
 
         let queryTable = $("body > center > form");
         let GPA_Table_HTML = "" +
             "<table class='form' cellspacing='0' cellpadding='0' id='hae_tb_gpa'>" +
-            "<tr><td>所有已修学科GPA（全部）</td><td>" + gpaALL + "</td></tr>" +
+            "<tr><td>所有已修学科GPA（全部：包括必修、限选、任选）</td><td>" + gpaALL + "</td></tr>" +
             "<tr><td>所有已修学科GPA（仅必修）</td><td>" + gpaRC + "</td></tr>" +
-            "<tr><td>当前页面GPA（全部）</td><td>" + gpaCurrentPage + "</td></tr>" +
+            "<tr><td>当前页面GPA</td><td>" + gpaCurrentPage + "</td></tr>" +
             "<tr style='color: red'><td colspan='2' title='某一门学科的GPA：(期末总评-50.0)/10.0（不及格科目GPA为0）\n备注：五级分制期末总评：优秀95，良好85，中75，及格65，不及格50。\n所有学科的GPA：（学科1GPA×学科1学分数+学科2GPA×学科2学分数+......）］/(所有学科学分之和)'>提示：计算结果仅供参考！<b>【计算方法】</b>（鼠标悬浮查看）</td></tr>" +
+            "<tr><td colspan='2' style='text-align: center'><input type='button' class='button' onclick=' $(\"#hae_tb_gpa\").remove();' value='关闭'></td></tr>" +
             "</table>";
 
         $("#hae_tb_gpa").remove();
         queryTable.append(GPA_Table_HTML);
     }
 
+    /**
+     * 核心评价代码，在评价页面，自动选择单选框，自动填写评语
+     */
     function eva_core() {
         //取出所有radios组件
         var radios = $("input:radio");
@@ -351,7 +404,7 @@
 
     //选择第row行的第index个radio，其中row从0开始，index从0开始
     function checkRadioIndexOf(radios, row, index) {
-        radios[row * 4 + index].setAttribute("checked", true)
+        radios[row * 4 + index].setAttribute("checked", true);
     }
 
     //你认为教师在教学上最值得肯定之处？ 随机一个 老师值得肯定的地方
@@ -411,6 +464,9 @@
     }
 
 
+    /**
+     * 在个人成绩页面，自动拼接单科GPA到每一行末尾
+     */
     function appendGPA() {
         let rowlength = $("body > center > table > tbody > tr").length - 1;
         let headRow = $("body > center > table > tbody > tr:nth-child(1)");
