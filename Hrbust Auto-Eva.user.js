@@ -6,6 +6,8 @@
 // @version      1.5
 // @description  哈尔滨理工大学（hrbust） 教学评估自动完成脚本。在http://jwzx.hrbust.edu.cn/内，评估课程，教学评价自动完成脚本。使用方法：打开教务在线-点击"评估课程"/"教学评价"，稍等片刻，自动完成全部课程评价。
 // @author       Jason Zhang
+// @updateURL    https://cdn.jsdelivr.net/gh/zhangxujie2018/Hrbust-Auto-Eva@master/Hrbust%20Auto-Eva.user.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/zhangxujie2018/Hrbust-Auto-Eva@master/Hrbust%20Auto-Eva.user.js
 // @homepageURL  https://github.com/zhangxujie2018/Hrbust-Auto-Eva
 // @supportURL   https://github.com/zhangxujie2018/Hrbust-Auto-Eva/issues
 // @match        http://jwzx.hrbust.edu.cn/academic/eva/index/evaindexinfo.jsdo*
