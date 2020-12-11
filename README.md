@@ -30,7 +30,7 @@
   
 
 
-# 更新日志 | [查看完整日志](https://raw.githubusercontent.com/zhangxujie2018/Hrbust-Auto-Eva/master/Update-log.md)
+# 更新日志 | [查看完整日志](https://cdn.jsdelivr.net/gh/zhangxujie2018/Hrbust-Auto-Eva@master/Update-log.md)
 
 ## v1.5:
 * 在【个人成绩查询】中增加GPA计算，包括所有课程GPA、仅必修GPA。
