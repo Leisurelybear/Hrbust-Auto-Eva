@@ -23,7 +23,6 @@
 
 
 * 应用截图：
-  - ![评估课程菜单](https://s3.ax1x.com/2020/11/25/Ddh0mj.png)
   - ![应用场景截图1](https://s3.ax1x.com/2020/12/07/DvRg3T.png)
   - ![应用场景截图2](https://s3.ax1x.com/2020/11/25/DdhB0s.png)
   - ![GPA计算](https://s3.ax1x.com/2020/12/10/rifrHP.png)
