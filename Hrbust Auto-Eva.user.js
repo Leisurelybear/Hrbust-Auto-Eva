@@ -3,6 +3,7 @@
 // @require      https://cdn.staticfile.org/jquery/3.3.1/jquery.min.js
 // @grant        GM_setValue
 // @grant        GM_getValue
+// @grant        GM_deleteValue
 // @name         哈尔滨理工大学 教务在线 评估课程&教学评价自动完成、个人GPA计算脚本 Hrbust Auto-Eva
 // @namespace    http://tampermonkey.net/
 // @version      1.6
@@ -15,6 +16,8 @@
 // @match        http://jwzx.hrbust.edu.cn/academic/eva/index/evaindexinfo.jsdo*
 // @match        http://jwzx.hrbust.edu.cn/academic/eva/index/resultlist.jsdo*
 // @match        http://jwzx.hrbust.edu.cn/academic/manager/score/studentOwnScore.do*
+// @match        http://jwzx.hrbust.edu.cn/academic/common/security/login.jsp*
+// @match        http://jwzx.hrbust.edu.cn/homepage/index.do*
 // @run-at       document-end
 // @license      MIT
 // @icon         https://s3.ax1x.com/2020/11/22/DG9DVe.png
@@ -64,9 +67,12 @@
 
 
 /////////////////////////---- start -----///////////////////////////
+
     var URL_keyword_score = "studentOwnScore"; //学生个人成绩URL关键词
     var URL_keyword_evaindexinfo = "evaindexinfo"; //评价详细信息URL关键词
     var URL_keyword_resultlist = "resultlist"; //待评价列表URL关键词
+    var URL_keyword_login = "login.jsp";
+    var URL_keyword_homeindex = "homepage/index.do";
     var dataMap = new Map();//数据map
 
     listen(); //程序开始
@@ -77,6 +83,11 @@
     function listen() {
         console.log("Auto-Eva started...");
 
+        if (window.location.href.indexOf(URL_keyword_homeindex) !== -1 || window.location.href.indexOf(URL_keyword_login) !== -1) {
+            //考虑到每次重新登录账号，清除过期的GPA_ALL和GPA_RC
+            GM_deleteValue('GPA_ALL');
+            GM_deleteValue('GPA_RC');
+        }
 
         if (window.location.href.indexOf(URL_keyword_score) !== -1) {
 
