@@ -1,10 +1,12 @@
 // ==UserScript==
 /* globals jQuery, $, waitForKeyElements */
 // @require      https://cdn.staticfile.org/jquery/3.3.1/jquery.min.js
-// @name         哈尔滨理工大学 教务在线 教学评价、评估课程自动完成脚本 Hrbust Auto-Eva
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @name         哈尔滨理工大学 教务在线 评估课程&教学评价自动完成、个人GPA计算脚本 Hrbust Auto-Eva
 // @namespace    http://tampermonkey.net/
-// @version      1.5
-// @description  哈尔滨理工大学（hrbust） 教学评估自动完成脚本。在http://jwzx.hrbust.edu.cn/内，评估课程，教学评价自动完成脚本。使用方法：打开教务在线-点击"评估课程"/"教学评价"，稍等片刻，自动完成全部课程评价。
+// @version      1.6
+// @description  哈尔滨理工大学（hrbust） 评估课程&教学评价自动完成、个人GPA计算脚本。作用于哈理工教务在线（http://jwzx.hrbust.edu.cn/）内。
 // @author       Jason Zhang
 // @updateURL    https://cdn.jsdelivr.net/gh/zhangxujie2018/Hrbust-Auto-Eva@master/Hrbust%20Auto-Eva.user.js
 // @downloadURL  https://cdn.jsdelivr.net/gh/zhangxujie2018/Hrbust-Auto-Eva@master/Hrbust%20Auto-Eva.user.js
@@ -184,105 +186,110 @@
      */
     function calGPA() {
         $("#hae_tb_gpa").remove();
-
-        if (dataMap.has(URL_keyword_score)) {
-            // console.log(dataMap.get(URL_keyword_score));
-
-
-        } else {
-            //请求全部科目
-            $.ajax({
-                type: "POST",
-                url: "http://jwzx.hrbust.edu.cn/academic/manager/score/studentOwnScore.do",
-                data: {
-                    'year': '',
-                    'term': '',
-                    'prop': '',
-                    'groupName': '',
-                    'para': '0',
-                    'sortColumn': '',
-                    'Submit': '查询',
-                },
-                async: false,
-                success: function (result) {
-                    var base = document.createElement('div');//创建dom节点
-                    base.innerHTML = result;//把请求的网页放到div中
-                    //div > center > table > tbody > tr:nth-child(2)
-
-                    let tbody = base.querySelector("div > center > table > tbody");//选择器选择出tr
-                    tbody.removeChild(tbody.firstChild);//移除表头
-                    let rows = tbody.children;//rows为许多行成绩
-
-                    dataMap.set(URL_keyword_score, rows);
-                }
-
-
-            });
-        }
-        let rows = dataMap.get(URL_keyword_score);
-
-        let gpaALLWeight = 0;//加权GPA：单科GPA*学分之和
-        let creditALL = 0;//单科学分之和
-
-        let gpaRCWeight = 0;//加权GPA：仅必修课
-        let creditRC = 0;//仅必修课
-
-        for (let i = 0; i < rows.length; i++) {
-            let currentRowTds = rows[i].children;
-
-            let score = currentRowTds[6].innerHTML.trim();//成绩
-            let credit = Number.parseFloat(currentRowTds[7].innerHTML.trim());//学分
-            let courseType = currentRowTds[9].innerHTML.trim();//课程属性，是否为必修
-            let passState = currentRowTds[12].innerHTML.trim();//通过状态
-            let testState = currentRowTds[11].innerHTML.trim();//考试状态
-
-            if (testState !== "正常考试") {
-                //补考或重修，不计入
-                continue;
-            }
-
-            //五级分制期末总评：优秀95，良好85，中75，及格65，不及格50。
-            if (isNaN(Number(score))) {//如果不是数字类型
-                score = getScoreBy5Level(score.trim());
-            }
-
-            let GPA = passState === '及格' ? ((score - 50.0) / 10.0) : 0;
-
-            //GPA = GPA * 100
-            GPA = parseFloat((GPA * 100).toFixed(10));
-            //credit = credit * 10
-            credit = parseFloat((credit * 10).toFixed(10));
-
-            if (GPA === 0) {//挂科
-                gpaALLWeight += 0;//加权GPA + 0
-                creditALL += credit;//学分需要加
-                if (courseType === "必修") {//必修课
-                    gpaRCWeight += 0;//加权GPA + 0
-                    creditRC += credit;//学分需要加
-                }
-
-            } else {//通过
-
-                gpaALLWeight += (GPA * credit);//加权GPA + 0
-                creditALL += credit;//学分需要加
-                if (courseType === "必修") {//必修课
-                    gpaRCWeight += (GPA * credit);//加权GPA 增加
-                    creditRC += credit;//学分需要加
-                }
-
-            }
-        }
-
-        //creditALL *= 100;
-        creditALL = parseFloat((creditALL * 100).toFixed(10));
-        //creditRC *= 100;
-        creditRC = parseFloat((creditRC * 100).toFixed(10));
-
-
-        let gpaALL = (gpaALLWeight / creditALL).toFixed(2);
-        let gpaRC = (gpaRCWeight / creditRC).toFixed(2);
+        let gpaALL = GM_getValue('GPA_ALL');
+        let gpaRC = GM_getValue('GPA_RC');
         let gpaCurrentPage = calculateCurrentPage();
 
+        if (typeof (gpaALL) == "undefined" || typeof (gpaRC) == "undefined") {
+            if (dataMap.has(URL_keyword_score)) {
+                // 已经获取过数据，仅仅点击关闭，所以下次不需要再次ajax请求
+            } else {
+
+                //请求全部科目
+                $.ajax({
+                    type: "POST",
+                    url: "http://jwzx.hrbust.edu.cn/academic/manager/score/studentOwnScore.do",
+                    data: {
+                        'year': '',
+                        'term': '',
+                        'prop': '',
+                        'groupName': '',
+                        'para': '0',
+                        'sortColumn': '',
+                        'Submit': '查询',
+                    },
+                    async: false,
+                    success: function (result) {
+                        var base = document.createElement('div');//创建dom节点
+                        base.innerHTML = result;//把请求的网页放到div中
+                        //div > center > table > tbody > tr:nth-child(2)
+
+                        let tbody = base.querySelector("div > center > table > tbody");//选择器选择出tr
+                        tbody.removeChild(tbody.firstChild);//移除表头
+                        let rows = tbody.children;//rows为许多行成绩
+
+                        dataMap.set(URL_keyword_score, rows);
+                    }
+
+
+                });
+            }
+            let rows = dataMap.get(URL_keyword_score);
+
+            let gpaALLWeight = 0;//加权GPA：单科GPA*学分之和
+            let creditALL = 0;//单科学分之和
+
+            let gpaRCWeight = 0;//加权GPA：仅必修课
+            let creditRC = 0;//仅必修课
+
+            for (let i = 0; i < rows.length; i++) {
+                let currentRowTds = rows[i].children;
+
+                let score = currentRowTds[6].innerHTML.trim();//成绩
+                let credit = Number.parseFloat(currentRowTds[7].innerHTML.trim());//学分
+                let courseType = currentRowTds[9].innerHTML.trim();//课程属性，是否为必修
+                let passState = currentRowTds[12].innerHTML.trim();//通过状态
+                let testState = currentRowTds[11].innerHTML.trim();//考试状态
+
+                if (testState !== "正常考试") {
+                    //补考或重修，不计入
+                    continue;
+                }
+
+                //五级分制期末总评：优秀95，良好85，中75，及格65，不及格50。
+                if (isNaN(Number(score))) {//如果不是数字类型
+                    score = getScoreBy5Level(score.trim());
+                }
+
+                let GPA = passState === '及格' ? ((score - 50.0) / 10.0) : 0;
+
+                //GPA = GPA * 100
+                GPA = parseFloat((GPA * 100).toFixed(10));
+                //credit = credit * 10
+                credit = parseFloat((credit * 10).toFixed(10));
+
+                if (GPA === 0) {//挂科
+                    gpaALLWeight += 0;//加权GPA + 0
+                    creditALL += credit;//学分需要加
+                    if (courseType === "必修") {//必修课
+                        gpaRCWeight += 0;//加权GPA + 0
+                        creditRC += credit;//学分需要加
+                    }
+
+                } else {//通过
+
+                    gpaALLWeight += (GPA * credit);//加权GPA + 0
+                    creditALL += credit;//学分需要加
+                    if (courseType === "必修") {//必修课
+                        gpaRCWeight += (GPA * credit);//加权GPA 增加
+                        creditRC += credit;//学分需要加
+                    }
+
+                }
+            }
+
+            //creditALL *= 100;
+            creditALL = parseFloat((creditALL * 100).toFixed(10));
+            //creditRC *= 100;
+            creditRC = parseFloat((creditRC * 100).toFixed(10));
+
+            gpaALL = (gpaALLWeight / creditALL).toFixed(2);
+            gpaRC = (gpaRCWeight / creditRC).toFixed(2);
+            gpaCurrentPage = calculateCurrentPage();
+
+            GM_setValue('GPA_ALL', gpaALL);
+            GM_setValue('GPA_RC', gpaRC);
+        }
 
         let queryTable = $("body > center > form");
         let GPA_Table_HTML = "" +
@@ -294,7 +301,6 @@
             "<tr><td colspan='2' style='text-align: center'><input type='button' class='button' onclick=' $(\"#hae_tb_gpa\").remove();' value='关闭'></td></tr>" +
             "</table>";
 
-        $("#hae_tb_gpa").remove();
         queryTable.append(GPA_Table_HTML);
     }
 
