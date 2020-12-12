@@ -41,6 +41,6 @@
 # 关于
 * [![Github](https://img.shields.io/badge/HrbusSt%20Auto--Eva%20issue-v1.6-brightgreen)](https://github.com/zhangxujie2018/Hrbust-Auto-Eva/issues)
 * 如果大家有问题BUG反馈、或者有其他希望添加的功能，欢迎大家点击上方图片链接到issue内反馈。
-* 如果觉得还不错，也可以点个tar支持一下(●ˇ∀ˇ●)。
+* 如果觉得还不错，也可以点个Star支持一下(●ˇ∀ˇ●)。
 
 
