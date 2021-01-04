@@ -6,18 +6,14 @@
 // @grant        GM_deleteValue
 // @name         哈尔滨理工大学 教务在线 评估课程&教学评价自动完成、个人GPA计算脚本 Hrbust Auto-Eva
 // @namespace    http://tampermonkey.net/
-// @version      1.6
+// @version      1.7
 // @description  哈尔滨理工大学（hrbust） 评估课程&教学评价自动完成、个人GPA计算脚本。作用于哈理工教务在线（http://jwzx.hrbust.edu.cn/）内。
 // @author       Jason Zhang
 // @updateURL    https://cdn.jsdelivr.net/gh/zhangxujie2018/Hrbust-Auto-Eva@master/Hrbust%20Auto-Eva.user.js
 // @downloadURL  https://cdn.jsdelivr.net/gh/zhangxujie2018/Hrbust-Auto-Eva@master/Hrbust%20Auto-Eva.user.js
 // @homepageURL  https://github.com/zhangxujie2018/Hrbust-Auto-Eva
 // @supportURL   https://github.com/zhangxujie2018/Hrbust-Auto-Eva/issues
-// @match        http://jwzx.hrbust.edu.cn/academic/eva/index/evaindexinfo.jsdo*
-// @match        http://jwzx.hrbust.edu.cn/academic/eva/index/resultlist.jsdo*
-// @match        http://jwzx.hrbust.edu.cn/academic/manager/score/studentOwnScore.do*
-// @match        http://jwzx.hrbust.edu.cn/academic/common/security/login.jsp*
-// @match        http://jwzx.hrbust.edu.cn/homepage/index.do*
+// @match        http://jwzx.hrbust.edu.cn/*
 // @run-at       document-end
 // @license      MIT
 // @icon         https://s3.ax1x.com/2020/11/22/DG9DVe.png
@@ -73,6 +69,10 @@
     var URL_keyword_resultlist = "resultlist"; //待评价列表URL关键词
     var URL_keyword_login = "login.jsp";
     var URL_keyword_homeindex = "homepage/index.do";
+    var URL_keyword_indexnew = "academic/index_new.jsp";
+    var URL_keyword_menu = "listLeft.do";
+
+
     var dataMap = new Map();//数据map
 
     listen(); //程序开始
@@ -82,6 +82,14 @@
      */
     function listen() {
         console.log("Auto-Eva started...");
+
+
+        if (window.location.href.indexOf(URL_keyword_menu) !== -1) {
+            console.log("menu")
+            appendController()
+
+
+        }
 
         if (window.location.href.indexOf(URL_keyword_homeindex) !== -1 || window.location.href.indexOf(URL_keyword_login) !== -1) {
             //考虑到每次重新登录账号，清除过期的GPA_ALL和GPA_RC
@@ -114,7 +122,7 @@
 
             //body > center > table.infolist_tab > tbody > tr:nth-child(1)
             let innerTabRow = $("body > center > table.infolist_tab > tbody > tr");
-            console.log(innerTabRow)
+            // console.log(innerTabRow)
             for (let i = 1; i <= innerTabRow.length; i++) {
                 //console.log(innerTabRow[i])
                 //评估 a href标签  nth-child 选择第n个子节点，从1开始
@@ -141,6 +149,15 @@
         }
 
     }
+
+    /**
+     * menu 拼接进入自动评估选项
+     */
+    function appendController() {
+        var gotoEva = "<li><script type=\"text/javascript\">    var moduleStatus506 = true;</script></head><body><a onclick=\"showInfo(506)\" href=\"./accessModule.do?moduleId=506\" target=\"mainFrame\"><span style='color: red'>>>点击进入自动评估课程<<</span></a></li>";
+        $("#menu").append(gotoEva)
+    }
+
 
     /**
      * 计算当前页面的GPA
