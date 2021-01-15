@@ -1,7 +1,9 @@
 # Hrbust-Auto-Eva
-[![Github](https://img.shields.io/badge/HrbusSt%20Auto--Eva-v1.7-brightgreen)](https://github.com/zhangxujie2018/Hrbust-Auto-Eva)
+[![Github](https://img.shields.io/badge/HrbusSt%20Auto--Eva-v1.7-brightgreen)](https://github.com/zhangxujie2018/Hrbust-Auto-Eva) 
+[![Github](https://img.shields.io/github/stars/zhangxujie2018/Hrbust-Auto-Eva)](https://github.com/zhangxujie2018/Hrbust-Auto-Eva) 
 
-![mit](https://img.shields.io/badge/license-MIT-blue)
+
+![mit](https://img.shields.io/github/license/zhangxujie2018/Hrbust-Auto-Eva)
 ![pfm](https://img.shields.io/badge/platform-Chrome%20%7C%20Firefox%20%7C%20Edge%20%7C%20etc.-lightgrey)
 ![Tampermonkey](https://img.shields.io/badge/Tampermonkey-v4.11-blue)
 
@@ -50,6 +52,6 @@
 
 # 关于
 * 如果大家有问题BUG反馈、或者有其他希望添加的功能，欢迎大家点击上方图片链接到issue内反馈。
-* 如果觉得还不错，也可以点个Star支持一下(●ˇ∀ˇ●)。
+* 如果觉得还不错，也可以点个Star [![Github](https://img.shields.io/github/stars/zhangxujie2018/Hrbust-Auto-Eva)](https://github.com/zhangxujie2018/Hrbust-Auto-Eva) 支持一下(●ˇ∀ˇ●)。
 
 
