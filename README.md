@@ -1,4 +1,10 @@
 # Hrbust-Auto-Eva
+[![Github](https://img.shields.io/badge/HrbusSt%20Auto--Eva-v1.7-brightgreen)](https://github.com/zhangxujie2018/Hrbust-Auto-Eva)
+
+![mit](https://img.shields.io/badge/license-MIT-blue)
+![pfm](https://img.shields.io/badge/platform-Chrome%20%7C%20Firefox%20%7C%20Edge%20%7C%20etc.-lightgrey)
+![Tampermonkey](https://img.shields.io/badge/Tampermonkey-v4.11-blue)
+
 哈尔滨理工大学（hrbust） 评估课程&教学评价自动完成、个人GPA计算**油猴脚本**。
 
 ![logo](https://s3.ax1x.com/2020/11/22/DG9DVe.png)
@@ -43,7 +49,6 @@
 * 在【个人成绩查询】中增加GPA计算，包括所有课程GPA、仅必修GPA。
 
 # 关于
-* [![Github](https://img.shields.io/badge/HrbusSt%20Auto--Eva%20issue-v1.6-brightgreen)](https://github.com/zhangxujie2018/Hrbust-Auto-Eva/issues)
 * 如果大家有问题BUG反馈、或者有其他希望添加的功能，欢迎大家点击上方图片链接到issue内反馈。
 * 如果觉得还不错，也可以点个Star支持一下(●ˇ∀ˇ●)。
 
