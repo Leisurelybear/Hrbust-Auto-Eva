@@ -8,11 +8,11 @@
 // @namespace    http://tampermonkey.net/
 // @version      1.7
 // @description  哈尔滨理工大学（hrbust） 评估课程&教学评价自动完成、个人GPA计算脚本。作用于哈理工教务在线（http://jwzx.hrbust.edu.cn/）内。
-// @author       Jason Zhang
-// @updateURL    https://cdn.jsdelivr.net/gh/zhangxujie2018/Hrbust-Auto-Eva@master/Hrbust%20Auto-Eva.user.js
-// @downloadURL  https://cdn.jsdelivr.net/gh/zhangxujie2018/Hrbust-Auto-Eva@master/Hrbust%20Auto-Eva.user.js
-// @homepageURL  https://github.com/zhangxujie2018/Hrbust-Auto-Eva
-// @supportURL   https://github.com/zhangxujie2018/Hrbust-Auto-Eva/issues
+// @author       Leisurelybear
+// @updateURL    https://cdn.jsdelivr.net/gh/Leisurelybear/Hrbust-Auto-Eva@master/Hrbust%20Auto-Eva.user.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/Leisurelybear/Hrbust-Auto-Eva@master/Hrbust%20Auto-Eva.user.js
+// @homepageURL  https://github.com/Leisurelybear/Hrbust-Auto-Eva
+// @supportURL   https://github.com/Leisurelybear/Hrbust-Auto-Eva/issues
 // @match        http://jwzx.hrbust.edu.cn/*
 // @run-at       document-end
 // @license      MIT
