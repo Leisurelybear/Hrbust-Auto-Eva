@@ -1,12 +1,12 @@
 # Hrbust-Auto-Eva
 
-[![Github](https://img.shields.io/badge/Hrbust--Auto--Eva-v1.7-green?logo=github&style=flat)](https://github.com/Leisurelybear/Hrbust-Auto-Eva)
+[![Github](https://img.shields.io/badge/Hrbust--Auto--Eva-v1.8-green?logo=github&style=flat)](https://github.com/Leisurelybear/Hrbust-Auto-Eva)
 ![view](https://palerock.cn/node-service/images/greasyfork/views-info/416572)
 ![install](https://palerock.cn/node-service/images/greasyfork/stats/daily-installs/416572)
 ![check_daily](https://palerock.cn/node-service/images/greasyfork/stats/daily-updates/416572)
 ![mit](https://img.shields.io/github/license/Leisurelybear/Hrbust-Auto-Eva)
 ![pfm](https://img.shields.io/badge/platform-Chrome%20v87%20%7C%20Firefox%20%7C%20Edge%20%7C%20etc.-lightgrey)
-![Tampermonkey](https://img.shields.io/badge/Tampermonkey-v4.11-blue)
+![Tampermonkey](https://img.shields.io/badge/Tampermonkey-v4.16.1-blue)
 
 哈尔滨理工大学（hrbust） 评估课程&教学评价自动完成、个人 GPA 计算**油猴脚本**。
 
