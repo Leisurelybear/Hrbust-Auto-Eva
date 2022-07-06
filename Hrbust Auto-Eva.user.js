@@ -240,8 +240,8 @@
      */
     function calGPA() {
         $("#hae_tb_gpa").remove();
-        let gpaALL = parseFloat(GM_getValue("GPA_ALL"));
-        let gpaRC = parseFloat(GM_getValue("GPA_RC"));
+        let gpaALL = GM_getValue("GPA_ALL");
+        let gpaRC = GM_getValue("GPA_RC");
         let gpaCurrentPage = calculateCurrentPage().gpaCurrentPage;
         let gpaRCCurrentPage = calculateCurrentPage().gpaRCCurrentPage;
         if (typeof gpaALL == "undefined" || typeof gpaRC == "undefined") {
