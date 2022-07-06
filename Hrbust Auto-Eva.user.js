@@ -244,12 +244,7 @@
         let gpaRC = GM_getValue("GPA_RC");
         let gpaCurrentPage = calculateCurrentPage().gpaCurrentPage;
         let gpaRCCurrentPage = calculateCurrentPage().gpaRCCurrentPage;
-        if (
-            gpaALL == "NaN" ||
-            gpaRC == "NaN" ||
-            typeof gpaALL == "undefined" ||
-            typeof gpaRC == "undefined"
-        ) {
+        if (typeof gpaALL == "undefined" || typeof gpaRC == "undefined") {
             if (dataMap.has(URL_keyword_score)) {
                 // 已经获取过数据，仅仅点击关闭，所以下次不需要再次ajax请求
             } else {
