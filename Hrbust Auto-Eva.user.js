@@ -6,7 +6,7 @@
 // @grant        GM_deleteValue
 // @name         哈尔滨理工大学 教务在线 评估课程&教学评价自动完成、个人GPA计算脚本 Hrbust Auto-Eva
 // @namespace    http://tampermonkey.net/
-// @version      1.7
+// @version      1.8
 // @description  哈尔滨理工大学（hrbust） 评估课程&教学评价自动完成、个人GPA计算脚本。作用于哈理工教务在线（http://jwzx.hrbust.edu.cn/）内。
 // @author       Leisurelybear
 // @updateURL    https://cdn.jsdelivr.net/gh/Leisurelybear/Hrbust-Auto-Eva@master/Hrbust%20Auto-Eva.user.js
